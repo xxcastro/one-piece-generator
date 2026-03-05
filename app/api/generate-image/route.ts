@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
       {
         headers: {
-          Authorization: `Bearer ${process.env.HUGGINGFACE_TOKEN}`,
+          Authorization: `Bearer ${process.env.HF_API_KEY}`,
           "Content-Type": "application/json",
         },
         method: "POST",
