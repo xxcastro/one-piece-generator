@@ -1,33 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 60;
+// IMPORTANTE: En el plan gratuito, el maxDuration máximo es 10.
+export const maxDuration = 10; 
+export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  const { imagePrompt } = await req.json();
+  try {
+    const { imagePrompt } = await req.json();
+    const seed = Math.floor(Math.random() * 99999);
+    
+    // Añadimos parámetros para que la imagen sea más pequeña y rápida de generar
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=512&height=512&nologo=true&seed=${seed}`;
 
-  const response = await fetch(
-    "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
-      },
-      body: JSON.stringify({
-        text_prompts: [{ text: imagePrompt }],
-        cfg_scale: 7,
-        height: 1024,
-        width: 1024,
-        samples: 1,
-        steps: 30,
-      }),
+    // Vercel (desde USA) hace la petición a Pollinations
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      return new Response("Error en Pollinations", { status: 502 });
     }
-  );
 
-  const data = await response.json();
-  console.log("Stability response:", JSON.stringify(data));
-  const imageBase64 = data.artifacts[0].base64;
+    // Leemos la imagen como un array de datos (buffer)
+    const arrayBuffer = await response.arrayBuffer();
 
-  return NextResponse.json({ imageUrl: `data:image/png;base64,${imageBase64}` });
+    // Devolvemos la imagen directamente al navegador
+    return new Response(arrayBuffer, {
+      headers: {
+        "Content-Type": "image/jpeg",
+        "Cache-Control": "no-store", // Para que siempre genere una nueva
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response("Error interno", { status: 500 });
+  }
 }
