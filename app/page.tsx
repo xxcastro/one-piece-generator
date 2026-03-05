@@ -9,7 +9,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<FormType | null>(null);
   const [result, setResult] = useState<CharacterResult | null>(null);
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imagePrompt, setImagePrompt] = useState<string>("");
 
   const handleGenerate = async (formData: FormType) => {
     setLoading(true);
@@ -25,7 +25,7 @@ export default function Home() {
       const data = await res.json();
       setForm(formData);
       setResult({ ...data.description, berrys: data.berrys });
-      setImageUrl(data.imageUrl);
+      setImagePrompt(data.imagePrompt);
     } catch {
       setError("Error al generar el personaje. Inténtalo de nuevo.");
     } finally {
@@ -36,7 +36,7 @@ export default function Home() {
   const handleReset = () => {
     setForm(null);
     setResult(null);
-    setImageUrl("");
+    setImagePrompt("");
     setError(null);
   };
 
@@ -46,7 +46,7 @@ export default function Home() {
         <CharacterResultView
           form={form}
           result={result}
-          imageUrl={imageUrl}
+          imagePrompt={imagePrompt}
           onReset={handleReset}
         />
       ) : (

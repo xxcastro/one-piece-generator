@@ -1,26 +1,53 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CharacterForm, CharacterResult } from "@/types/character";
 import { formatBerrys } from "@/lib/berry-calculator";
 
 interface Props {
   form: CharacterForm;
   result: CharacterResult;
-  imageUrl: string;
+  imagePrompt: string;
   onReset: () => void;
 }
 
-export default function CharacterResultView({ form, result, imageUrl, onReset }: Props) {
+export default function CharacterResultView({ form, result, imagePrompt, onReset }: Props) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
   const showPoster = form.faction !== "Marine";
+
+  useEffect(() => {
+  if (!imagePrompt) return;
+
+  const fetchImage = async () => {
+    try {
+      const res = await fetch("/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ imagePrompt }),
+      });
+      const data = await res.json();
+      setImageUrl(data.imageUrl);
+    } catch {
+      console.error("Error generando imagen");
+    }
+    };
+
+    fetchImage();
+  }, [imagePrompt]);
+
 
   const copyVideoPrompt = () => {
     navigator.clipboard.writeText(result.videoPrompt);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
+  const downloadImage = () => {
+    const link = document.createElement("a");
+    link.href = imageUrl;
+    link.download = `${form.name}-one-piece.png`;
+    link.click();
+  };
   const shareOn = (platform: "twitter" | "reddit") => {
     const text = `¡Soy ${form.name} con una recompensa de ${formatBerrys(result.berrys)} Berrys en One Piece! 🏴‍☠️`;
     const urls = {
@@ -33,7 +60,6 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 text-white">
 
-      {/* Nombre y título */}
       <div className="text-center mb-8">
         <h1 className="text-5xl font-black text-yellow-400 tracking-widest mb-2">
           {form.name.toUpperCase()}
@@ -41,18 +67,26 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
         <p className="text-white/60 italic text-lg">"{result.title}"</p>
       </div>
 
-      {/* Imagen + Cartel */}
       <div className={`grid gap-6 mb-8 ${showPoster ? "grid-cols-2" : "grid-cols-1 max-w-xs mx-auto"}`}>
-
-        {/* Imagen del personaje */}
-        <div className="rounded-xl overflow-hidden border border-yellow-400/40 bg-gray-900 aspect-[2/3]">
-          <img
-            src={imageUrl}
-            alt={form.name}
-            onLoad={() => setImageLoaded(true)}
-            style={{ display: imageLoaded ? "block" : "none" }}
-            className="w-full h-full object-cover"
-          />
+        <div className="rounded-xl overflow-hidden border border-yellow-400/40 bg-gray-900 aspect-[2/3] relative">
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt={form.name}
+              onLoad={() => setImageLoaded(true)}
+              style={{ display: imageLoaded ? "block" : "none" }}
+              className="w-full h-full object-cover"
+            />
+          )}
+          {imageLoaded && (
+            <button
+              onClick={downloadImage}
+              className="absolute bottom-2 right-2 px-3 py-1.5 rounded-lg bg-black/60 text-yellow-400 text-xs font-bold border border-yellow-400/40 hover:bg-black/80 transition-all"
+            >
+              ⬇ Descargar
+            </button>
+          )}
+          
           {!imageLoaded && (
             <div className="w-full h-full flex flex-col items-center justify-center gap-4 min-h-64">
               <div className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
@@ -61,7 +95,6 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
           )}
         </div>
 
-        {/* Cartel de recompensa */}
         {showPoster && (
           <div className="rounded-sm p-4 font-bold"
             style={{
@@ -92,7 +125,6 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
         )}
       </div>
 
-      {/* Tarjetas de info */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         {[
           { label: "⚓ Origen", text: result.background },
@@ -107,7 +139,6 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
         ))}
       </div>
 
-      {/* Stats */}
       <div className="rounded-xl p-4 bg-yellow-400/5 border border-yellow-400/20 flex flex-wrap gap-4 justify-center mb-6">
         {[
           ["Facción", form.faction],
@@ -126,7 +157,6 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
         ))}
       </div>
 
-      {/* Prompt para video */}
       <div className="rounded-xl p-5 mb-6 border border-purple-400/30 bg-purple-400/5">
         <div className="flex justify-between items-center mb-3">
           <p className="text-purple-300 text-xs font-bold tracking-widest">🎬 PROMPT PARA VIDEO IA</p>
@@ -138,7 +168,6 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
         <p className="text-white/70 text-sm leading-relaxed">{result.videoPrompt}</p>
       </div>
 
-      {/* Compartir */}
       <div className="flex gap-3 justify-center mb-6 flex-wrap">
         <button onClick={() => shareOn("twitter")}
           className="px-5 py-2.5 rounded-lg border-2 border-sky-400 text-sky-400 text-sm font-bold bg-sky-400/10">
@@ -154,7 +183,6 @@ export default function CharacterResultView({ form, result, imageUrl, onReset }:
         </a>
       </div>
 
-      {/* Reset */}
       <div className="text-center">
         <button onClick={onReset}
           className="px-10 py-3.5 rounded-xl bg-yellow-400 text-black font-black tracking-widest text-sm">
