@@ -5,16 +5,28 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   const { imagePrompt } = await req.json();
 
-  const seed = Math.floor(Math.random() * 99999);
-  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=512&height=768&nologo=true&seed=${seed}`;
+  const response = await fetch(
+    "https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${process.env.STABILITY_API_KEY}`,
+      },
+      body: JSON.stringify({
+        text_prompts: [{ text: imagePrompt }],
+        cfg_scale: 7,
+        height: 768,
+        width: 512,
+        samples: 1,
+        steps: 30,
+      }),
+    }
+  );
 
-  const response = await fetch(url);
+  const data = await response.json();
+  const imageBase64 = data.artifacts[0].base64;
 
-  if (!response.ok) {
-    return NextResponse.json({ error: "Error generando imagen" }, { status: 500 });
-  }
-
-  // En vez de base64, devolvemos la URL directamente
-  // Vercel hace de proxy y evita el bloqueo de Cloudflare
-  return NextResponse.json({ imageUrl: url });
+  return NextResponse.json({ imageUrl: `data:image/png;base64,${imageBase64}` });
 }
