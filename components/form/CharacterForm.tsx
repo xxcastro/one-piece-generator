@@ -7,9 +7,9 @@ import SelectGrid from "@/components/ui/SelectGrid";
 import StepIndicator from "@/components/ui/StepIndicator";
 
 const INITIAL: FormType = {
-  name: "", gender: "Hombre", faction: "Pirata", race: "Humano",
-  devilFruit: "Ninguna", haki: "Ninguno", weapon: "Espadachín",
-  specialty: "Capitán", height: 1.7, laugh: "", style: "Animación One Piece",
+  name: "", gender: "Hombre", faction: "", race: "",
+  devilFruit: "", haki: "", weapon: "",
+  specialty: "", height: 1.7, laugh: "", style: "Animación One Piece",
 };
 
 interface Props {
@@ -24,7 +24,10 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
     setForm((f) => ({ ...f, [key]: val }));
     };
     const canProceed = () => {
-      if (step === 0) return !!form.name.trim();
+      if (step === 0) return !!form.name.trim() && !!form.gender && !!form.faction && !!form.race;
+      if (step === 1) return !!form.devilFruit && !!form.haki && !!form.weapon;
+      if (step === 2) return !!form.specialty && !!form.laugh.trim();
+      if (step === 3) return !!form.style;
       return true;
     };
     const steps = [
@@ -39,7 +42,7 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
                                 value={form.name}
                                 onChange={(e) => set("name", e.target.value)}
                                 placeholder="Escribe tu nombre..."
-                                className="w-full px-4 py-3 rounded-lg bg-white/5 text-white text-sm outline-none border-2 border-yellow-400/30 focus:border-yellow-400 placeholder:text-white/30"
+                                className="w-full px-4 py-3 rounded-lg bg-white/5 text-white text-sm outline-none border-2 border-red-400/30 focus:border-red-400 placeholder:text-white/30"
                               />
                             </div>
                             <div>
@@ -84,14 +87,14 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
                               <FieldLabel>Estatura</FieldLabel>
                               <div className="flex justify-between mb-2">
                                 <span className="text-white/50 text-xs">0.5m</span>
-                                <span className="text-yellow-400 text-xl font-bold">{form.height.toFixed(1)}m</span>
+                                <span className="text-red-500 text-xl font-bold">{form.height.toFixed(1)}m</span>
                                 <span className="text-white/50 text-xs">30m</span>
                               </div>
                               <input
                                 type="range" min={0.5} max={30} step={0.1}
                                 value={form.height}
                                 onChange={(e) => set("height", parseFloat(e.target.value))}
-                                className="w-full accent-yellow-400"
+                                className="w-full accent-red-400"
                               />
                             </div>
                             <div>
@@ -104,7 +107,7 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
                                 value={form.laugh}
                                 onChange={(e) => set("laugh", e.target.value)}
                                 placeholder="Ej: Shishishi, Zehahaha..."
-                                className="w-full px-4 py-3 rounded-lg bg-white/5 text-white text-sm outline-none border-2 border-yellow-400/30 focus:border-yellow-400 placeholder:text-white/30"
+                                className="w-full px-4 py-3 rounded-lg bg-white/5 text-white text-sm outline-none border-2 border-red-400/30 focus:border-red-400 placeholder:text-white/30"
                               />
                             </div>
                           </div>),
@@ -120,11 +123,11 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
                                 onClick={() => set("style", s as FormType["style"])}
                                 className={`p-5 rounded-xl text-left border-2 transition-all ${
                                   form.style === s
-                                    ? "border-yellow-400 bg-yellow-400/15"
-                                    : "border-white/15 bg-white/3 hover:border-yellow-400/40"
+                                    ? "border-red-400 bg-red-400/15"
+                                    : "border-white/15 bg-white/3 hover:border-red-400/40"
                                 }`}
                               >
-                                <div className={`font-bold mb-1 ${form.style === s ? "text-yellow-400" : "text-white"}`}>{s}</div>
+                                <div className={`font-bold mb-1 ${form.style === s ? "text-red-400" : "text-white"}`}>{s}</div>
                                 <div className="text-xs text-white/50">
                                   {s === "Animación One Piece"
                                     ? "Estilo manga de Eiichiro Oda, colores vibrantes"
@@ -140,18 +143,21 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
         <div className="w-full max-w-lg mx-auto px-4 py-6">
           {/* Título */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-black text-yellow-400 tracking-widest">ONE PIECE</h1>
-            <p className="text-white/40 text-xs tracking-widest mt-1">GENERADOR DE PERSONAJES</p>
+            <h1 className="text-4xl font-black uppercase tracking-[0.2em] [text-shadow:_2px_2px_0_rgb(30_58_138/0.4)]">
+              <span className="text-blue-600">ONE P</span>
+              <span className="text-red-600 drop-shadow-[0_0_5px_rgba(220,38,38,0.5)]">I</span>
+              <span className="text-blue-600">ECE</span>
+            </h1>
           </div>
 
           {/* Card */}
-          <div className="rounded-2xl p-8 bg-white/5 border border-yellow-400/20">
+          <div className="rounded-2xl p-8 bg-white/5 border border-red-400/20">
             
             <StepIndicator current={step} total={steps.length} />
 
             {/* Título del paso */}
             <div className="mb-7">
-              <h2 className="text-yellow-400 font-black text-xl tracking-widest mb-1">
+              <h2 className="text-red-500 font-black text-xl tracking-widest mb-1">
                 {steps[step].title.toUpperCase()}
               </h2>
               <p className="text-white/40 text-sm">{steps[step].subtitle}</p>
@@ -164,7 +170,7 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
             <div className="flex gap-3 mt-8">
               {step > 0 && (
                 <button
-                  onClick={() =>  setStep((s) => s - 1)}
+                  onClick={() => setStep((s) => s - 1)}
                   className="flex-1 py-3 rounded-xl border-2 border-white/15 text-white/60 text-xs font-bold tracking-widest hover:border-white/30"
                 >
                   ← ATRÁS
@@ -173,7 +179,7 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
               {step < steps.length - 1 ? (
                 <button
                   onClick={() => canProceed() && setStep((s) => s + 1)}
-                  className="flex-[2] py-3 rounded-xl bg-yellow-400 text-black text-xs font-black tracking-widest"
+                  className="flex-[2] py-3 rounded-xl bg-red-500 text-black text-xs font-black tracking-widest"
                 >
                   SIGUIENTE →
                 </button>
@@ -181,9 +187,9 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
                 <button
                   onClick={() => onGenerate(form)}
                   disabled={loading}
-                  className="flex-[2] py-3 rounded-xl bg-yellow-400 text-black text-xs font-black tracking-widest disabled:opacity-50"
+                  className="flex-[2] py-3 rounded-xl bg-red-500 text-black text-xs font-black tracking-widest disabled:opacity-50"
                 >
-                  {loading ? "GENERANDO..." : "⚓ FORJAR PERSONAJE"}
+                  {loading ? "GENERANDO..." : "FORJAR PERSONAJE"}
                 </button>
               )}
             </div>

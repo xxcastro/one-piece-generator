@@ -12,7 +12,7 @@ export default function StepIndicator({ current,total }: Props) {
                     <div
                         key={i}
                         className={i <= current
-                        ? "w-8 h-2 rounded-full bg-yellow-400"
+                        ? "w-8 h-2 rounded-full bg-red-500"
                         : "w-2 h-2 rounded-full bg-white/20"
                         }
                     />

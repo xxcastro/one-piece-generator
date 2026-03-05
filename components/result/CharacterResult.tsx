@@ -65,7 +65,7 @@ export default function CharacterResultView({ form, result, imagePrompt, onReset
     <div className="max-w-2xl mx-auto px-4 py-8 text-white">
 
       <div className="text-center mb-8">
-        <h1 className="text-5xl font-black text-yellow-400 tracking-widest mb-2">
+        <h1 className="text-5xl font-black text-red-500 tracking-widest mb-2">
           {form.name.toUpperCase()}
         </h1>
         <p className="text-white/60 italic text-lg">"{result.title}"</p>
@@ -85,7 +85,7 @@ export default function CharacterResultView({ form, result, imagePrompt, onReset
           {imageLoaded && (
             <button
               onClick={downloadImage}
-              className="absolute bottom-2 right-2 px-3 py-1.5 rounded-lg bg-black/60 text-yellow-400 text-xs font-bold border border-yellow-400/40 hover:bg-black/80 transition-all"
+              className="absolute bottom-2 right-2 px-3 py-1.5 rounded-lg bg-black/60 text-white-400 text-xs font-bold border border-red-400/40 hover:bg-black/80 transition-all"
             >
               ⬇ Descargar
             </button>
@@ -93,8 +93,8 @@ export default function CharacterResultView({ form, result, imagePrompt, onReset
           
           {!imageLoaded && (
             <div className="w-full h-full flex flex-col items-center justify-center gap-4 min-h-64">
-              <div className="w-10 h-10 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-              <p className="text-yellow-400 text-xs tracking-widest">GENERANDO IMAGEN...</p>
+              <div className="w-10 h-10 border-4 border-red-400 border-t-transparent rounded-full animate-spin" />
+              <p className="text-red-400 text-xs tracking-widest">GENERANDO IMAGEN...</p>
             </div>
           )}
         </div>
@@ -136,14 +136,14 @@ export default function CharacterResultView({ form, result, imagePrompt, onReset
           { label: "✨ Poderes", text: result.power },
           { label: "🏴‍☠️ Sueño", text: result.dream },
         ].map((card) => (
-          <div key={card.label} className="rounded-xl p-4 bg-white/5 border border-yellow-400/20">
-            <p className="text-yellow-400 text-xs font-bold tracking-widest mb-2">{card.label.toUpperCase()}</p>
+          <div key={card.label} className="rounded-xl p-4 bg-white/5 border border-red-400/20">
+            <p className="text-red-500 text-xs font-bold tracking-widest mb-2">{card.label.toUpperCase()}</p>
             <p className="text-white/80 text-sm leading-relaxed">{card.text}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl p-4 bg-yellow-400/5 border border-yellow-400/20 flex flex-wrap gap-4 justify-center mb-6">
+      <div className="rounded-xl p-4 bg-red-400/5 border border-yellow-400/20 flex flex-wrap gap-4 justify-center mb-6">
         {[
           ["Facción", form.faction],
           ["Raza", form.race],
@@ -189,10 +189,11 @@ export default function CharacterResultView({ form, result, imagePrompt, onReset
 
       <div className="text-center">
         <button onClick={onReset}
-          className="px-10 py-3.5 rounded-xl bg-yellow-400 text-black font-black tracking-widest text-sm">
-          ⚓ CREAR NUEVO PERSONAJE
+          className="px-10 py-3.5 rounded-xl bg-red-500 text-black font-black tracking-widest text-sm">
+          CREAR NUEVO PERSONAJE
         </button>
       </div>
+      
     </div>
   );
 }
