@@ -7,9 +7,9 @@ import SelectGrid from "@/components/ui/SelectGrid";
 import StepIndicator from "@/components/ui/StepIndicator";
 
 const INITIAL: FormType = {
-  name: "", gender: "Hombre", faction: "", race: "",
-  devilFruit: "Ninguna", haki: "Ninguno", weapon: "",
-  specialty: "", height: 1.7, laugh: "", style: "Animación One Piece",
+  name: "", gender: "Hombre", faction: "Pirata", race: "Humano",
+  devilFruit: "Ninguna", haki: "Ninguno", weapon: "Espadachín",
+  specialty: "Capitán", height: 1.7, laugh: "", style: "Animación One Piece",
 };
 
 interface Props {
@@ -22,6 +22,10 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
     const [form, setForm] = useState<FormType>(INITIAL);
     const set = <K extends keyof FormType>(key: K, val: FormType[K]) => {
     setForm((f) => ({ ...f, [key]: val }));
+    };
+    const canProceed = () => {
+      if (step === 0) return !!form.name.trim();
+      return true;
     };
     const steps = [
                       {
@@ -160,7 +164,7 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
             <div className="flex gap-3 mt-8">
               {step > 0 && (
                 <button
-                  onClick={() => setStep((s) => s - 1)}
+                  onClick={() =>  setStep((s) => s - 1)}
                   className="flex-1 py-3 rounded-xl border-2 border-white/15 text-white/60 text-xs font-bold tracking-widest hover:border-white/30"
                 >
                   ← ATRÁS
@@ -168,7 +172,7 @@ export default function CharacterForm({ onGenerate, loading }: Props) {
               )}
               {step < steps.length - 1 ? (
                 <button
-                  onClick={() => setStep((s) => s + 1)}
+                  onClick={() => canProceed() && setStep((s) => s + 1)}
                   className="flex-[2] py-3 rounded-xl bg-yellow-400 text-black text-xs font-black tracking-widest"
                 >
                   SIGUIENTE →
