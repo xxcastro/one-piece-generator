@@ -1,46 +1,38 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "nodejs";
-export const maxDuration = 10; 
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
-  try {
-    const { imagePrompt } = await req.json();
-    
-    // Usamos el nombre que tienes en Vercel
-    const token = process.env.HF_API_KEY;
+  const { imagePrompt } = await req.json();
 
-    if (!token) {
-      console.error("ERROR: La variable HF_API_KEY no está definida en Vercel");
-      return new Response("Configuración incompleta", { status: 500 });
-    }
-
-    const response = await fetch(
-      "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
+  const response = await fetch(
+    "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.HF_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputs: imagePrompt,
+        parameters: {
+          num_inference_steps: 4,
+          guidance_scale: 0.0,
+          width: 1024,
+          height: 1024,
         },
-        method: "POST",
-        body: JSON.stringify({ inputs: imagePrompt }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorDetail = await response.text();
-      console.error("Error de Hugging Face:", errorDetail);
-      // Devolvemos el estado real (401, 404, 503) para saber qué pasa
-      return new Response(`Error HF: ${response.status}`, { status: response.status });
+      }),
     }
+  );
 
-    const arrayBuffer = await response.arrayBuffer();
-
-    return new Response(arrayBuffer, {
-      headers: { "Content-Type": "image/png" },
-    });
-  } catch (error) {
-    console.error("Error en catch:", error);
-    return new Response("Error crítico", { status: 500 });
+  if (!response.ok) {
+    const error = await response.text();
+    console.error("HF error:", error);
+    return NextResponse.json({ error: "Error generando imagen" }, { status: 500 });
   }
+
+  const imageBuffer = await response.arrayBuffer();
+  const imageBase64 = Buffer.from(imageBuffer).toString("base64");
+
+  return NextResponse.json({ imageUrl: `data:image/png;base64,${imageBase64}` });
 }

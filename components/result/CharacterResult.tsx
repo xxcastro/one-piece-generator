@@ -20,25 +20,21 @@ export default function CharacterResultView({ form, result, imagePrompt, onReset
   if (!imagePrompt) return;
 
   const fetchImage = async () => {
-    try {
-      const res = await fetch("/api/generate-image", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imagePrompt }),
-      });
+  try {
+    const res = await fetch("/api/generate-image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imagePrompt }),
+    });
 
-      if (!res.ok) throw new Error("Fallo en la respuesta");
+    if (!res.ok) throw new Error("Fallo en la respuesta");
 
-      const imageBlob = await res.blob();
-      const localUrl = URL.createObjectURL(imageBlob);
-      
-      setImageUrl(localUrl);
-      setImageLoaded(true);
-    } catch (err) {
-      console.error("Error generando imagen:", err);
-      // Opcional: poner una imagen de error por defecto
-      // setImageUrl("/fallback-one-piece.png");
-    }
+    const data = await res.json();
+    setImageUrl(data.imageUrl);
+    setImageLoaded(false);
+  } catch (err) {
+    console.error("Error generando imagen:", err);
+  }
   };
 
     fetchImage();
