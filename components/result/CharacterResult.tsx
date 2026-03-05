@@ -41,8 +41,8 @@ export default function CharacterResultView({ form, result, imagePrompt, onReset
     }
   };
 
-  fetchImage();
-}, [imagePrompt]);
+    fetchImage();
+  }, [imagePrompt]);
 
 
   const copyVideoPrompt = () => {
