@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "edge";
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   const { imagePrompt } = await req.json();
@@ -14,8 +14,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Error generando imagen" }, { status: 500 });
   }
 
-  const imageBuffer = await response.arrayBuffer();
-  const imageBase64 = Buffer.from(imageBuffer).toString("base64");
-
-  return NextResponse.json({ imageUrl: `data:image/png;base64,${imageBase64}` });
+  // En vez de base64, devolvemos la URL directamente
+  // Vercel hace de proxy y evita el bloqueo de Cloudflare
+  return NextResponse.json({ imageUrl: url });
 }
