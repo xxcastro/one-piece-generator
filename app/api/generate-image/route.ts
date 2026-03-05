@@ -17,8 +17,8 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         text_prompts: [{ text: imagePrompt }],
         cfg_scale: 7,
-        height: 768,
-        width: 512,
+        height: 1024,
+        width: 1024,
         samples: 1,
         steps: 30,
       }),
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
   );
 
   const data = await response.json();
+  console.log("Stability response:", JSON.stringify(data));
   const imageBase64 = data.artifacts[0].base64;
 
   return NextResponse.json({ imageUrl: `data:image/png;base64,${imageBase64}` });
