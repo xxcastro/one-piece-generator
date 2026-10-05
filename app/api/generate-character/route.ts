@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     // Cambiado a llama-3.1-70b-versatile (o puedes usar llama-3.1-8b-instant si buscas menor latencia)
   const groqResult = await groq.chat.completions.create({
-    model: "llama-3.1-8b-instant", // Modelo activo, gratuito y sin problemas de deprecación
+    model: "openai/gpt-oss-20b", // <-- Modelo activo de tu lista con soporte json_mode
     messages: [{ role: "user", content: buildDescriptionPrompt(form) }],
     response_format: { type: "json_object" },
   });
