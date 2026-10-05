@@ -16,11 +16,11 @@ export async function POST(req: NextRequest) {
     const groq = new Groq({ apiKey });
 
     // Cambiado a llama-3.1-70b-versatile (o puedes usar llama-3.1-8b-instant si buscas menor latencia)
-    const groqResult = await groq.chat.completions.create({
-      model: "llama-3.1-70b-versatile",
-      messages: [{ role: "user", content: buildDescriptionPrompt(form) }],
-      response_format: { type: "json_object" }, // Fuerza respuesta JSON válida
-    });
+  const groqResult = await groq.chat.completions.create({
+    model: "llama-3.1-8b-instant", // Modelo activo, gratuito y sin problemas de deprecación
+    messages: [{ role: "user", content: buildDescriptionPrompt(form) }],
+    response_format: { type: "json_object" },
+  });
 
     const rawText = groqResult.choices[0]?.message?.content ?? "{}";
     const clean = rawText.replace(/```json|```/g, "").trim();
